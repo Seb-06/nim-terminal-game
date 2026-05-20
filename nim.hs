@@ -12,6 +12,8 @@ main = do
       | otherwise -> putStrLn "Size must be a positive integer"
     _ -> putStrLn "Usage: ./Nim.hs <size>"
 
+type Board = [Int]
+
 clearBoard :: Int -> IO ()
 clearBoard 0 = return ()
 clearBoard n = do
@@ -19,24 +21,24 @@ clearBoard n = do
   putStr "\ESC[2K"
   clearBoard (n - 1)
 
-drawBoard :: Int -> [Int] -> IO ()
+drawBoard :: Int -> Board -> IO ()
 drawBoard player board = do
   putBoard 1 board
   putStrLn ("\nPlayer " ++ show player ++ ", enter your turn. format: <line>#<how many pieces>")
   putStrLn "Example: line 1 removing 2 pieces => 1#2"
 
-putBoard :: Int -> [Int] -> IO ()
+putBoard :: Int -> Board -> IO ()
 putBoard _ [] = return ()
 putBoard n (x:xs) = do
   putStrLn (show n ++ ": " ++ replicate x '*')
   putBoard (n + 1) xs
 
-refreshBoard :: Int -> Int -> [Int] -> IO ()
+refreshBoard :: Int -> Int -> Board -> IO ()
 refreshBoard size player board = do
   clearBoard (size + 3)
   drawBoard player board
 
-playerMove :: [Int] -> Int -> IO (Int, Int)
+playerMove :: Board -> Int -> IO (Int, Int)
 playerMove board player = do
   putStr ("Player " ++ show player ++ ": ")
   input <- getLine
@@ -79,7 +81,7 @@ updateLine n new (x:xs) = x : updateLine (n - 1) new xs
 nextPlayer :: Int -> Int
 nextPlayer player = if player == 1 then 2 else 1
 
-play :: Int -> Int -> [Int] -> IO ()
+play :: Int -> Int -> Board -> IO ()
 play size player board = do
   (line, n) <- playerMove board player
   let idx = line - 1
